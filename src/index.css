@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #f5f0e8;
+  cursor: none;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Mobile scatter layouts — stack instead of absolute positioning below md */
+@media (max-width: 767px) {
+  .skills-scatter {
+    height: auto !important;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .skills-scatter .skill-item {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+  }
+
+  .skills-scatter .skill-anno,
+  .skills-scatter .skill-ghost,
+  .skills-scatter .skill-count {
+    display: none;
+  }
+
+  .gallery-scatter {
+    height: auto !important;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0 1rem 2rem;
+  }
+
+  .gallery-scatter .gallery-item {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+  }
+
+  .contact-scatter {
+    height: auto !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+  }
+
+  .contact-scatter .social-item {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+  }
+
+  .contact-scatter .social-caption {
+    position: relative !important;
+    bottom: auto !important;
+    right: auto !important;
+    margin-top: 0.5rem;
+  }
+}
