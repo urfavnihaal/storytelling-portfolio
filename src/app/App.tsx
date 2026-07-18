@@ -40,7 +40,7 @@ export default function App() {
     <ScrollProvider>
       <GrainBackground />
       <CustomCursor />
-      <div style={{ fontFamily: "'DM Sans', sans-serif" }}>
+      <main style={{ fontFamily: "'DM Sans', sans-serif" }}>
         <Navbar active={active} />
         <HeroSection />
         <MyStorySection />
@@ -52,7 +52,7 @@ export default function App() {
         <ExperienceSection />
         <ProcessSection />
         <ContactSection />
-      </div>
+      </main>
     </ScrollProvider>
   );
 }

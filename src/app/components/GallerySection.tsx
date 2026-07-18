@@ -195,6 +195,8 @@ export function GallerySection() {
                       data-anim="polaroid-img"
                       src={p.src}
                       alt={p.caption}
+                      loading="lazy"
+                      decoding="async"
                       style={{
                         display: "block",
                         width: "min(100%, 190px)",
