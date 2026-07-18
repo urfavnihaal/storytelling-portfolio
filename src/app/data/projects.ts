@@ -36,7 +36,7 @@ export const PROJECTS: Project[] = [
   {
     index: "04",
     tech: "Figma · Web Design · UI/UX",
-    title: "Sanborn Website",
+    title: "Sansbound Lab Website",
     description:
       "Designed and developed the official website for Sanborn — clean, brand-aligned, built from the ground up.",
   },
