@@ -2,36 +2,11 @@ import React, { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import SplitType from "split-type";
 import { useTypewriter } from "../hooks/useTypewriter";
 import { Arrow } from "./Arrow";
 import { Tape } from "./Tape";
 
 gsap.registerPlugin(ScrollTrigger);
-
-/**
- * Small helper: combines two independent motion sources (a slow idle drift and
- * a scroll-linked shift) that both want to drive the same `y` value on the
- * same element. Without this, an idle tween and a ScrollTrigger-driven tween
- * would fight over `y` every frame. Both sources report their latest number
- * here; we add them and push the result through a single quickTo setter.
- */
-function createYDriver(target: HTMLElement | null) {
-  let idle = 0;
-  let scroll = 0;
-  const yTo = target ? gsap.quickTo(target, "y", { duration: 0.5, ease: "power2.out" }) : null;
-  const apply = () => yTo?.(idle + scroll);
-  return {
-    setIdle(v: number) {
-      idle = v;
-      apply();
-    },
-    setScroll(v: number) {
-      scroll = v;
-      apply();
-    },
-  };
-}
 
 export function HeroSection() {
   const [typewriterEnabled, setTypewriterEnabled] = useState(false);
@@ -77,6 +52,9 @@ export function HeroSection() {
     () => {
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const isFinePointer = window.matchMedia("(pointer: fine)").matches;
+      // "Mobile" here means the same breakpoint the layout already uses (lg = 1024px),
+      // so animation weight follows the same rules as the responsive layout itself.
+      const isMobile = !window.matchMedia("(min-width: 1024px)").matches;
 
       // ── Reduced motion: skip straight to the final, fully visible state ──
       if (prefersReducedMotion) {
@@ -101,152 +79,155 @@ export function HeroSection() {
         return;
       }
 
-      // ────────────────────────────────────────────────────────────────
-      // 1–8. ENTRANCE TIMELINE
-      // ────────────────────────────────────────────────────────────────
-      const splitInstances: SplitType[] = [];
-      let nameChars: Element[] = [];
-      if (heading1Ref.current && heading2Ref.current) {
-        const split1 = new SplitType(heading1Ref.current, { types: "chars" });
-        const split2 = new SplitType(heading2Ref.current, { types: "chars" });
-        splitInstances.push(split1, split2);
-        nameChars = [...(split1.chars || []), ...(split2.chars || [])];
-      }
-
-      const tl = gsap.timeline({ delay: 0.05 });
-
-      // 1. Paper grain fades in
-      tl.fromTo(grainRef.current, { opacity: 0 }, { opacity: 0.05, duration: 1.4, ease: "power1.out" }, 0);
-
-      // 2. Camera zooms in
-      tl.fromTo(cameraRef.current, { scale: 1.08 }, { scale: 1, duration: 1.6, ease: "power3.out" }, 0);
-
-      // 3. Notebook content drops into place
-      tl.fromTo(
-        notebookRef.current,
-        { y: -46, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.1, ease: "elastic.out(1, 0.65)" },
-        0.15
-      );
-
-      // 4. Name reveals character-by-character
-      if (nameChars.length) {
-        tl.fromTo(
-          nameChars,
-          { opacity: 0, y: 26 },
-          { opacity: 1, y: 0, duration: 0.6, ease: "power4.out", stagger: 0.022 },
-          0.4
-        );
-      }
-
-      // 5. Blue marker highlight draws itself
-      tl.fromTo(blueMarkerRef.current, { width: 0 }, { width: "88%", duration: 1.0, ease: "power3.inOut" }, 1.15);
-
-      // 6. Stickies enter individually — unique timing, direction, overshoot
-      tl.fromTo(tornPaperRef.current, { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, ease: "power2.out" }, 0.2);
-      tl.fromTo(scrollCueRef.current, { x: -20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: "power2.out" }, 1.7);
-      tl.fromTo(
-        locTapeRef.current,
-        { rotate: -5, opacity: 0, scale: 0.9 },
-        { rotate: -1.8, opacity: 1, scale: 1, duration: 1.2, ease: "elastic.out(1, 0.5)" },
-        1.05
-      );
-      tl.fromTo(
-        blueRef.current,
-        { opacity: 0, y: 40, rotate: -8 },
-        { opacity: 1, y: 0, rotate: -3, duration: 1.2, ease: "elastic.out(1, 0.6)" },
-        0.5
-      );
-      tl.fromTo(
-        yellowRef.current,
-        { opacity: 0, y: 50, rotate: 6 },
-        { opacity: 1, y: 0, rotate: 2.5, duration: 1.1, ease: "back.out(1.8)" },
-        0.68
-      );
-      tl.fromTo(
-        pinkRef.current,
-        { opacity: 0, y: 30, rotate: -4 },
-        { opacity: 1, y: 0, rotate: -1.5, duration: 1.2, ease: "elastic.out(1, 0.5)" },
-        0.85
-      );
-      tl.fromTo(
-        greenRef.current,
-        { opacity: 0, scale: 0.8, rotate: 8 },
-        { opacity: 1, scale: 1, rotate: 3, duration: 1.0, ease: "back.out(2.2)" },
-        1.0
-      );
-      tl.fromTo(
-        annoRef.current,
-        { opacity: 0, scale: 0.8, rotate: -12 },
-        { opacity: 1, scale: 1, rotate: -6, duration: 0.6, ease: "power2.out" },
-        1.3
-      );
-
-      // 7. Handwritten annotation — marker-writing reveal
-      if (annoTextRef.current) {
-        tl.fromTo(
-          annoTextRef.current,
-          { clipPath: "inset(0 100% 0 0)" },
-          { clipPath: "inset(0 0% 0 0)", duration: 0.65, ease: "power2.inOut" },
-          1.4
-        );
-      }
-
-      // 8. SVG doodles draw themselves
-      const bottomDoodle = containerRef.current?.querySelector(".bottom-doodle path");
-      if (bottomDoodle) {
-        gsap.set(bottomDoodle, { strokeDasharray: 200, strokeDashoffset: 200 });
-        tl.to(bottomDoodle, { strokeDashoffset: 0, duration: 1.4, ease: "power2.out" }, 1.5);
-      }
-      const circleDoodle = containerRef.current?.querySelector(".circle-doodle path");
-      if (circleDoodle) {
-        gsap.set(circleDoodle, { strokeDasharray: 200, strokeDashoffset: 200, opacity: 0 });
-        tl.to(circleDoodle, { strokeDashoffset: 0, opacity: 0.22, duration: 1.7, ease: "power2.out" }, 1.55);
-      }
-
-      // 9. Typewriter starts only once the name has finished revealing
-      tl.call(() => setTypewriterEnabled(true), [], 1.05);
-
-      // Scroll cue gentle pulse — invites the reader into the story
-      if (scrollCueRef.current) {
-        tl.fromTo(
-          scrollCueRef.current.parentElement,
-          { opacity: 0 },
-          { opacity: 1, duration: 0.5 },
-          1.85
-        );
-      }
-
-      // ────────────────────────────────────────────────────────────────
-      // IDLE MOTION (after entrance settles)
-      // ────────────────────────────────────────────────────────────────
       const idleTweens: gsap.core.Tween[] = [];
-      const stickyDrivers: ReturnType<typeof createYDriver>[] = [];
+
+      // ────────────────────────────────────────────────────────────────
+      // CORE ENTRANCE — only what the user sees in the first paint:
+      // notebook, name, blue marker highlight, one primary sticky.
+      // No SplitType: the heading reveals as a whole block (the
+      // overflow-hidden wrapper + a y/opacity tween gives the same
+      // "rises into place" feel without hundreds of char nodes).
+      // ────────────────────────────────────────────────────────────────
+      const core = gsap.timeline({ delay: 0.05 });
+
+      core.fromTo(grainRef.current, { opacity: 0 }, { opacity: 0.05, duration: 1.2, ease: "power1.out" }, 0);
+      core.fromTo(cameraRef.current, { scale: 1.06 }, { scale: 1, duration: 1.3, ease: "power3.out" }, 0);
+      core.fromTo(
+        notebookRef.current,
+        { y: -36, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.9, ease: "power3.out" },
+        0.1
+      );
+
+      // Name reveal — both lines as single blocks, staggered slightly
+      core.fromTo(
+        [heading1Ref.current, heading2Ref.current],
+        { y: 34, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.7, ease: "power3.out", stagger: 0.08 },
+        0.3
+      );
+
+      // Blue marker highlight draws itself
+      core.fromTo(blueMarkerRef.current, { width: 0 }, { width: "88%", duration: 0.85, ease: "power3.inOut" }, 0.75);
+
+      // Primary sticky (blue) — the one thing that should feel "alive" immediately
+      core.fromTo(
+        blueRef.current,
+        { opacity: 0, y: 30, rotate: -8 },
+        { opacity: 1, y: 0, rotate: -3, duration: 0.9, ease: "back.out(1.7)" },
+        0.35
+      );
+
+      // Typewriter starts right after the name has landed
+      core.call(() => setTypewriterEnabled(true), [], 0.85);
+
+      // ────────────────────────────────────────────────────────────────
+      // DEFERRED / DECORATIVE ENTRANCE — torn paper, tape, remaining
+      // stickies, annotation, doodles, scroll cue. Runs after the core
+      // sequence so it never competes for the main thread during first
+      // paint / LCP, and is skipped almost entirely on mobile.
+      // ────────────────────────────────────────────────────────────────
+      const startDecorativeEntrance = () => {
+        const deco = gsap.timeline();
+
+        deco.fromTo(tornPaperRef.current, { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" }, 0);
+        deco.fromTo(
+          locTapeRef.current,
+          { rotate: -5, opacity: 0 },
+          { rotate: -1.8, opacity: 1, duration: 0.8, ease: "back.out(1.6)" },
+          0
+        );
+        deco.fromTo(
+          yellowRef.current,
+          { opacity: 0, y: 30, rotate: 6 },
+          { opacity: 1, y: 0, rotate: 2.5, duration: 0.7, ease: "back.out(1.6)" },
+          0.08
+        );
+        deco.fromTo(
+          pinkRef.current,
+          { opacity: 0, y: 20, rotate: -4 },
+          { opacity: 1, y: 0, rotate: -1.5, duration: 0.7, ease: "power2.out" },
+          0.16
+        );
+        deco.fromTo(
+          greenRef.current,
+          { opacity: 0, scale: 0.85, rotate: 8 },
+          { opacity: 1, scale: 1, rotate: 3, duration: 0.6, ease: "back.out(1.8)" },
+          0.24
+        );
+        deco.fromTo(
+          annoRef.current,
+          { opacity: 0, scale: 0.85, rotate: -12 },
+          { opacity: 1, scale: 1, rotate: -6, duration: 0.4, ease: "power2.out" },
+          0.32
+        );
+        if (annoTextRef.current) {
+          deco.fromTo(
+            annoTextRef.current,
+            { clipPath: "inset(0 100% 0 0)" },
+            { clipPath: "inset(0 0% 0 0)", duration: 0.5, ease: "power2.inOut" },
+            0.36
+          );
+        }
+        if (scrollCueRef.current?.parentElement) {
+          deco.fromTo(scrollCueRef.current.parentElement, { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.4);
+        }
+
+        // SVG doodles draw themselves — cheapest last
+        const bottomDoodle = containerRef.current?.querySelector(".bottom-doodle path");
+        if (bottomDoodle) {
+          gsap.set(bottomDoodle, { strokeDasharray: 200, strokeDashoffset: 200 });
+          deco.to(bottomDoodle, { strokeDashoffset: 0, duration: 1.1, ease: "power2.out" }, 0.2);
+        }
+        if (!isMobile) {
+          const circleDoodle = containerRef.current?.querySelector(".circle-doodle path");
+          if (circleDoodle) {
+            gsap.set(circleDoodle, { strokeDasharray: 200, strokeDashoffset: 200, opacity: 0 });
+            deco.to(circleDoodle, { strokeDashoffset: 0, opacity: 0.22, duration: 1.3, ease: "power2.out" }, 0.25);
+          }
+        }
+      };
+
+      // Fire once the core sequence settles, but yield to the browser first
+      // so it never lands on top of first paint / LCP work.
+      core.call(
+        () => {
+          if ("requestIdleCallback" in window) {
+            (window as any).requestIdleCallback(startDecorativeEntrance, { timeout: 600 });
+          } else {
+            requestAnimationFrame(startDecorativeEntrance);
+          }
+        },
+        [],
+        ">"
+      );
+
+      // ────────────────────────────────────────────────────────────────
+      // IDLE MOTION — starts after everything above. Rich on desktop,
+      // minimal on mobile (a single subtle cue), respecting the
+      // "keep only one or two subtle idle animations on mobile" rule.
+      // ────────────────────────────────────────────────────────────────
+      const stickyDrivers: { setIdle: (v: number) => void; setScroll: (v: number) => void }[] = [];
+
       const startIdleMotion = () => {
-        // Paper "breathing" — a hair of vertical drift on the whole camera
+        // Scroll indicator bounce — the one idle animation kept on every device
+        const scrollIndicator = scrollCueRef.current?.parentElement;
+        if (scrollIndicator) {
+          idleTweens.push(
+            gsap.to(scrollIndicator, { y: 6, duration: 1.8, ease: "sine.inOut", repeat: -1, yoyo: true })
+          );
+        }
+
+        if (isMobile) return; // mobile stops here: one subtle idle animation only
+
+        // Paper "breathing" — a hair of vertical drift on the whole camera (desktop only)
         idleTweens.push(
-          gsap.to(cameraRef.current, {
-            y: 3,
-            duration: 5.5,
-            ease: "sine.inOut",
-            repeat: -1,
-            yoyo: true,
-          })
+          gsap.to(cameraRef.current, { y: 3, duration: 5.5, ease: "sine.inOut", repeat: -1, yoyo: true })
         );
 
-        // Slow grain flicker/movement
-        idleTweens.push(
-          gsap.to(grainRef.current, {
-            opacity: 0.07,
-            backgroundPosition: "12px 8px",
-            duration: 6,
-            ease: "sine.inOut",
-            repeat: -1,
-            yoyo: true,
-          })
-        );
-
-        // Each sticky: independent rotate wobble + combined y (idle + scroll)
+        // Each sticky: independent rotate wobble + combined y (idle + scroll),
+        // sharing a single quickTo setter per element so idle drift and
+        // scroll parallax never fight over the same property.
         const stickies = [
           { inner: blueInnerRef, dur: 3.4, rot: 1.4 },
           { inner: yellowInnerRef, dur: 4.1, rot: -1.8 },
@@ -258,17 +239,24 @@ export function HeroSection() {
         stickies.forEach(({ inner, dur, rot }) => {
           if (!inner.current) return;
           idleTweens.push(
-            gsap.to(inner.current, {
-              rotate: rot,
-              duration: dur,
-              ease: "sine.inOut",
-              repeat: -1,
-              yoyo: true,
-            })
+            gsap.to(inner.current, { rotate: rot, duration: dur, ease: "sine.inOut", repeat: -1, yoyo: true })
           );
 
-          const driver = createYDriver(inner.current);
-          stickyDrivers.push(driver);
+          let idle = 0;
+          let scroll = 0;
+          const yTo = gsap.quickTo(inner.current, "y", { duration: 0.5, ease: "power2.out" });
+          const apply = () => yTo(idle + scroll);
+          stickyDrivers.push({
+            setIdle: (v) => {
+              idle = v;
+              apply();
+            },
+            setScroll: (v) => {
+              scroll = v;
+              apply();
+            },
+          });
+
           const floatTween = gsap.to(
             { v: -1 },
             {
@@ -278,89 +266,45 @@ export function HeroSection() {
               repeat: -1,
               yoyo: true,
               onUpdate() {
-                driver.setIdle((this.targets()[0] as { v: number }).v * 3);
+                stickyDrivers[stickyDrivers.length - 1].setIdle((this.targets()[0] as { v: number }).v * 3);
               },
             }
           );
           idleTweens.push(floatTween);
         });
-
-        // Single shared ScrollTrigger for all sticky scroll parallax (avoids 5 duplicates)
-        if (stickyDrivers.length) {
-          ScrollTrigger.create({
-            trigger: containerRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-            onUpdate(self) {
-              const scrollY = self.progress * -50;
-              stickyDrivers.forEach((d) => d.setScroll(scrollY));
-            },
-          });
-        }
-
-        // Scroll indicator bounce
-        const scrollIndicator = scrollCueRef.current?.parentElement;
-        if (scrollIndicator) {
-          idleTweens.push(
-            gsap.to(scrollIndicator, {
-              y: 6,
-              duration: 1.8,
-              ease: "sine.inOut",
-              repeat: -1,
-              yoyo: true,
-            })
-          );
-        }
       };
 
-      tl.call(startIdleMotion, [], ">");
+      core.call(startIdleMotion, [], "+=0.2");
 
       // ────────────────────────────────────────────────────────────────
-      // SCROLL EXPERIENCE
+      // SCROLL EXPERIENCE — a single shared ScrollTrigger drives camera
+      // scale/opacity, background parallax, marker stretch, and sticky
+      // parallax together, instead of four separate triggers.
       // ────────────────────────────────────────────────────────────────
-      // Camera scales down slightly as the Hero scrolls out of view
-      gsap.to(cameraRef.current, {
-        scale: 0.94,
-        opacity: 0.92,
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
-      // Background dot texture drifts slower than the foreground (parallax depth)
-      gsap.to(bgRef.current, {
-        y: -30,
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
-      // Marker highlight stretches slightly on scroll
-      gsap.to(blueMarkerRef.current, {
-        scaleX: 1.12,
-        transformOrigin: "left center",
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
+      ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top top",
+        end: "bottom top",
+        scrub: true,
+        onUpdate(self) {
+          const p = self.progress;
+          gsap.set(cameraRef.current, { scale: 1 - p * 0.06, opacity: 1 - p * 0.08 });
+          gsap.set(bgRef.current, { y: p * -30 });
+          gsap.set(blueMarkerRef.current, { scaleX: 1 + p * 0.12, transformOrigin: "left center" });
+          if (!isMobile && stickyDrivers.length) {
+            const scrollY = p * -50;
+            stickyDrivers.forEach((d) => d.setScroll(scrollY));
+          }
         },
       });
 
       // ────────────────────────────────────────────────────────────────
       // INTERACTION — desktop mouse parallax (skipped on touch devices)
       // ────────────────────────────────────────────────────────────────
-      if (isFinePointer) {
+      let handleMouseMove: ((e: MouseEvent) => void) | undefined;
+      let handleMouseLeave: (() => void) | undefined;
+
+      if (isFinePointer && !isMobile) {
         const xToBg = gsap.quickTo(bgRef.current, "x", { duration: 0.8, ease: "power3" });
         const xToContent = gsap.quickTo(contentRef.current, "x", { duration: 0.8, ease: "power3" });
         const yToContent = gsap.quickTo(contentRef.current, "y", { duration: 0.8, ease: "power3" });
@@ -377,7 +321,7 @@ export function HeroSection() {
         // Note: bgRef only gets x from the mouse — its y is reserved for the
         // scroll-driven drift above, so the two never write to the same axis.
 
-        const handleMouseMove = (e: MouseEvent) => {
+        handleMouseMove = (e: MouseEvent) => {
           const { innerWidth, innerHeight } = window;
           const x = e.clientX / innerWidth - 0.5;
           const y = e.clientY / innerHeight - 0.5;
@@ -397,7 +341,7 @@ export function HeroSection() {
           yToAnno(y * 18);
         };
 
-        const handleMouseLeave = () => {
+        handleMouseLeave = () => {
           xToBg(0);
           xToContent(0);
           yToContent(0);
@@ -415,18 +359,14 @@ export function HeroSection() {
 
         containerRef.current?.addEventListener("mousemove", handleMouseMove);
         containerRef.current?.addEventListener("mouseleave", handleMouseLeave);
-
-        return () => {
-          containerRef.current?.removeEventListener("mousemove", handleMouseMove);
-          containerRef.current?.removeEventListener("mouseleave", handleMouseLeave);
-          idleTweens.forEach((t) => t.kill());
-          splitInstances.forEach((s) => s.revert());
-        };
       }
 
       return () => {
+        if (handleMouseMove) containerRef.current?.removeEventListener("mousemove", handleMouseMove);
+        if (handleMouseLeave) containerRef.current?.removeEventListener("mouseleave", handleMouseLeave);
         idleTweens.forEach((t) => t.kill());
-        splitInstances.forEach((s) => s.revert());
+        // ScrollTrigger instances created inside this scope are already
+        // reverted automatically by useGSAP's gsap.context on cleanup.
       };
     },
     { scope: containerRef }
@@ -456,6 +396,7 @@ export function HeroSection() {
         style={{
           opacity: 0,
           mixBlendMode: "multiply",
+          willChange: "opacity",
           backgroundImage:
             "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
           backgroundRepeat: "repeat",
@@ -471,6 +412,7 @@ export function HeroSection() {
           style={{
             backgroundImage: "radial-gradient(rgba(13,13,13,0.045) 1px,transparent 1px)",
             backgroundSize: "20px 20px",
+            willChange: "transform",
           }}
         />
 
@@ -495,7 +437,7 @@ export function HeroSection() {
         <div ref={notebookRef} className="relative z-10 w-full px-2 sm:px-6 lg:px-12 pt-16 sm:pt-10 lg:pt-28 pb-6 sm:pb-10 lg:pb-20">
           <div className="flex flex-col lg:flex-row items-start">
             {/* LEFT — name */}
-            <div ref={contentRef} className="relative w-full lg:flex-[0_0_60%]">
+            <div ref={contentRef} className="relative w-full lg:flex-[0_0_60%] max-w-none">
               <p ref={scrollCueRef} className="font-['Caveat'] text-base sm:text-lg lg:text-xl mb-3 sm:mb-4 lg:mb-6 tracking-wider" style={{ color: "rgba(13,13,13,0.38)" }}>
                 — creative portfolio · 2026
               </p>
@@ -508,11 +450,11 @@ export function HeroSection() {
                 S. Md.
               </div>
 
-              <div className="relative inline-block overflow-hidden">
+              <div className="relative w-full overflow-hidden">
                 <div
                   ref={heading2Ref}
                   className="font-['Anton'] leading-[0.87] text-[#0D0D0D] w-full"
-                  style={{ fontSize: "clamp(64px,18vw,182px)" }}
+                  style={{ fontSize: "clamp(70px,22vw,182px)" }}
                 >
                   NIHAAL
                 </div>
@@ -562,11 +504,33 @@ export function HeroSection() {
             </div>
 
             {/* RIGHT — sticky note cluster */}
-            <div className="relative w-full mt-5 sm:mt-7 lg:mt-0 flex flex-col items-center gap-2.5 sm:gap-4 lg:gap-5 min-h-fit lg:block lg:flex-[0_0_40%] lg:h-[560px]">
+            <div className="
+                relative
+                w-full
+                mt-8
+                grid grid-cols-2
+                gap-4
+                lg:block
+                lg:mt-0
+                lg:flex-[0_0_40%]
+                lg:h-[560px]
+              ">
               {/* Primary blue sticky */}
               <div
                 ref={blueRef}
-                className="relative w-[88%] max-w-[260px] mx-auto p-4 sm:p-5 lg:p-6 lg:absolute lg:w-full lg:max-w-[234px] lg:top-[48px] lg:right-[64px]"
+                className="
+                relative
+                w-full
+                max-w-none
+                p-4
+                sm:p-5
+                lg:p-6
+                lg:absolute
+                lg:w-full
+                lg:max-w-[234px]
+                lg:top-[48px]
+                lg:right-[64px]
+                "
                 style={{
                   background: "#1A6BFF",
                   boxShadow: "4px 6px 18px rgba(26,107,255,0.38)",
@@ -589,7 +553,8 @@ export function HeroSection() {
               {/* Yellow sticky */}
               <div
                 ref={yellowRef}
-                className="relative w-[88%] max-w-[240px] mx-auto py-3 px-4 sm:py-3.5 sm:px-5 lg:absolute lg:w-full lg:max-w-[220px] lg:top-[252px] lg:right-[124px]"
+                className="relative w-full
+max-w-none py-3 px-4 sm:py-3.5 sm:px-5 lg:absolute lg:w-full lg:max-w-[220px] lg:top-[252px] lg:right-[124px]"
                 style={{
                   background: "#FFF176",
                   boxShadow: "3px 4px 13px rgba(0,0,0,0.16)",

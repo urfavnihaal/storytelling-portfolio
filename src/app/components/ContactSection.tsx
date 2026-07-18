@@ -79,14 +79,14 @@ export function ContactSection() {
           </div>
 
           {/* Right — scattered socials */}
-          <div className="relative contact-scatter md:h-[340px]">
+          <div className="grid grid-cols-2 gap-4 sm:gap-5 mt-4">
             {SOCIALS.map((s, i) => (
               <a
                 key={i}
                 href={s.href}
                 target={s.href.startsWith("http") ? "_blank" : undefined}
                 rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="absolute social-item block transition-all duration-200 hover:scale-110 hover:z-50"
+                className="block transition-all duration-200 hover:scale-105"
                 style={{
                   top: s.top,
                   left: s.left,
@@ -111,7 +111,7 @@ export function ContactSection() {
         {/* Footer */}
         <div className="mt-12 sm:mt-16 lg:mt-24 pt-6 sm:pt-8 flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between sm:items-center transition-all duration-700 delay-400" style={{ borderTop: "1px solid rgba(13,13,13,0.08)", opacity: visible ? 1 : 0 }}>
           <span className="font-['Permanent_Marker'] text-lg" style={{ color: "rgba(13,13,13,0.28)" }}>
-            S. Md. Nihaal © 2024
+            S. Md. Nihaal © 2026
           </span>
           <span className="font-['Caveat'] text-base" style={{ color: "rgba(13,13,13,0.28)" }}>
             crafted with 💙 in Chennai
