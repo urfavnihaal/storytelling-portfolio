@@ -109,7 +109,11 @@ export function ProjectsSection() {
       // SECTION ENTRANCE — chapter 04, stamped title, squiggle
       // ====================================================================
       const intro = gsap.timeline({
-        scrollTrigger: { trigger: root, start: "top 80%", once: true },
+        scrollTrigger: {
+  trigger: q('[data-anim="p1-card"]')[0],
+  start: "top 82%",
+  toggleActions: "play none none reverse"
+},
         defaults: { ease: "power3.out" },
       });
 
@@ -154,7 +158,11 @@ export function ProjectsSection() {
       // number, tech, title, description, tags — one timeline.
       // ====================================================================
       const p1Tl = gsap.timeline({
-        scrollTrigger: { trigger: q('[data-anim="p1-card"]')[0], start: "top 82%", once: true },
+        scrollTrigger: {
+  trigger: q('[data-anim="p1-card"]')[0],
+  start: "top 82%",
+  toggleActions: "play none none reverse"
+},
         defaults: { ease: "power3.out" },
       });
       p1Tl
@@ -198,7 +206,11 @@ export function ProjectsSection() {
       // wipe, slow image zoom-out, title, giant number.
       // ====================================================================
       const p2Tl = gsap.timeline({
-        scrollTrigger: { trigger: q('[data-anim="p2-card"]')[0], start: "top 82%", once: true },
+        scrollTrigger: {
+  trigger: q('[data-anim="p2-card"]')[0],
+start: "top 82%",
+toggleActions: "play none none reverse",
+},
         defaults: { ease: "power3.out" },
       });
       p2Tl
@@ -247,7 +259,11 @@ export function ProjectsSection() {
         const cardEl = q(`[data-anim="${card}"]`)[0];
         if (!cardEl) return;
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: cardEl, start: "top 85%", once: true },
+          scrollTrigger: {
+  trigger: cardEl,
+start: "top 85%",
+toggleActions: "play none none reverse",
+},
           defaults: { ease: "power3.out" },
         });
         tl.fromTo(cardEl, { opacity: 0, y: 46 }, { opacity: 1, y: 0, duration: 0.6 }, 0);
@@ -280,7 +296,11 @@ export function ProjectsSection() {
       // PROJECT 05 — the calm final chapter: number, then title, then copy.
       // ====================================================================
       const p5Tl = gsap.timeline({
-        scrollTrigger: { trigger: q('[data-anim="p5-card"]')[0], start: "top 85%", once: true },
+        scrollTrigger: {
+  trigger: q('[data-anim="p5-card"]')[0],
+start: "top 85%",
+toggleActions: "play none none reverse",
+},
         defaults: { ease: "power2.out" },
       });
       p5Tl
@@ -344,18 +364,7 @@ export function ProjectsSection() {
       // EXIT ANIMATION — cards drift up and fade slightly as the section
       // is scrolled past, like turning to the next page.
       // ====================================================================
-      gsap.to(q('[data-anim$="-card"]'), {
-        y: -30,
-        opacity: 0.88,
-        ease: "power1.in",
-        stagger: 0.03,
-        scrollTrigger: {
-          trigger: root,
-          start: "bottom 70%",
-          end: "bottom top",
-          scrub: 0.5,
-        },
-      });
+      
 
       // ====================================================================
       // HOVER INTERACTIONS (desktop / fine-pointer only) — lift, tilt-ish
@@ -495,95 +504,6 @@ export function ProjectsSection() {
           </div>
         </div>
 
-        
-        {/* 02 — Yellow paper + image */}
-        <div
-          data-anim="p2-card"
-          className="flex flex-col lg:flex-row mb-6 sm:mb-8 lg:mb-12 relative overflow-hidden min-h-[280px] sm:min-h-[380px] lg:min-h-0"
-          data-cursor="view"
-        >
-          <div
-            data-anim="p2-paper"
-            className="flex flex-col justify-center p-5 sm:p-8 lg:p-12 relative overflow-hidden w-full lg:basis-[55%]"
-            style={{ background: "#FFF176" }}
-          >
-            <div data-anim="p2-tape">
-              <Tape style={{ width: "100px", height: "26px", top: "16px", right: "-8px", transform: "rotate(-6deg)" }} />
-            </div>
-            <div
-              data-anim="p2-tech"
-              className="font-['Caveat'] text-sm uppercase tracking-widest mb-4"
-              style={{ color: "rgba(13,13,13,0.42)" }}
-            >
-              {p2.tech}
-            </div>
-            <h3
-              data-anim="p2-title"
-              className="font-['Anton'] leading-none text-3xl lg:text-[42px] text-[#0D0D0D]"
-            >
-              {p2.title}
-            </h3>
-            <p
-              className="font-['DM_Sans'] mt-5 text-base leading-relaxed"
-              style={{ color: "rgba(13,13,13,0.62)" }}
-            >
-              {p2.description}
-            </p>
-            <div
-              data-anim="p2-number"
-              className="font-['Anton'] absolute bottom-2 right-6 leading-none pointer-events-none"
-              style={{ fontSize: "clamp(56px,14vw,98px)", color: "rgba(13,13,13,0.07)" }}
-            >
-              {p2.index}
-            </div>
-          </div>
-
-          <Tilt
-            className="relative overflow-hidden w-full lg:basis-[45%]"
-            style={{ background: "#F5F0E8" }}
-          >
-            <img
-              data-anim="p2-image"
-              src={p2.imageUrl}
-              alt={p2.imageAlt}
-              className="w-full h-full object-cover"
-              style={{ filter: "sepia(10%) contrast(1.08)" }}
-            />
-            {/* Mask Reveal */}
-            <div
-              data-anim="p2-mask"
-              className="absolute inset-0 bg-[#FFFDF7] z-10"
-              style={{ transformOrigin: "right center" }}
-            />
-          </Tilt>
-
-          {/* Animated border */}
-          <svg
-            data-anim="p2-border"
-            className="absolute inset-0 w-full h-full pointer-events-none z-20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <filter id="p2-glow-blur" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="4" />
-              </filter>
-            </defs>
-            <rect
-              data-anim="p2-border-glow"
-              x="1.5"
-              y="1.5"
-              width="calc(100% - 3px)"
-              height="calc(100% - 3px)"
-              stroke="#FFF176"
-              strokeWidth="6"
-              opacity="0"
-              filter="url(#p2-glow-blur)"
-            />
-            <rect x="1.5" y="1.5" width="calc(100% - 3px)" height="calc(100% - 3px)" stroke="#FFF176" strokeWidth="3" />
-          </svg>
-        </div>
-
         {/* 01 — Blue / Dark split */}
         <div
           data-anim="p1-card"
@@ -683,6 +603,93 @@ export function ProjectsSection() {
           </svg>
         </div>
 
+        {/* 02 — Yellow paper + image */}
+        <div
+          data-anim="p2-card"
+          className="flex flex-col lg:flex-row mb-6 sm:mb-8 lg:mb-12 relative overflow-hidden min-h-[280px] sm:min-h-[380px] lg:min-h-0"
+          data-cursor="view"
+        >
+          <div
+            data-anim="p2-paper"
+            className="flex flex-col justify-center p-5 sm:p-8 lg:p-12 relative overflow-hidden w-full lg:basis-[55%]"
+            style={{ background: "#FFF176" }}
+          >
+            <div data-anim="p2-tape">
+              <Tape style={{ width: "100px", height: "26px", top: "16px", right: "-8px", transform: "rotate(-6deg)" }} />
+            </div>
+            <div
+              data-anim="p2-tech"
+              className="font-['Caveat'] text-sm uppercase tracking-widest mb-4"
+              style={{ color: "rgba(13,13,13,0.42)" }}
+            >
+              {p2.tech}
+            </div>
+            <h3
+              data-anim="p2-title"
+              className="font-['Anton'] leading-none text-3xl lg:text-[42px] text-[#0D0D0D]"
+            >
+              {p2.title}
+            </h3>
+            <p
+              className="font-['DM_Sans'] mt-5 text-base leading-relaxed"
+              style={{ color: "rgba(13,13,13,0.62)" }}
+            >
+              {p2.description}
+            </p>
+            <div
+              data-anim="p2-number"
+              className="font-['Anton'] absolute bottom-2 right-6 leading-none pointer-events-none"
+              style={{ fontSize: "clamp(56px,14vw,98px)", color: "rgba(13,13,13,0.07)" }}
+            >
+              {p2.index}
+            </div>
+          </div>
+
+          <Tilt
+            className="relative overflow-hidden w-full lg:basis-[45%]"
+            style={{ background: "#F5F0E8" }}
+          >
+            <img
+              data-anim="p2-image"
+              src={p2.imageUrl}
+              alt={p2.imageAlt}
+              className="w-full h-full object-cover"
+              style={{ filter: "sepia(10%) contrast(1.08)" }}
+            />
+            {/* Mask Reveal */}
+            <div
+              data-anim="p2-mask"
+              className="absolute inset-0 bg-[#FFFDF7] z-10"
+              style={{ transformOrigin: "right center" }}
+            />
+          </Tilt>
+
+          {/* Animated border */}
+          <svg
+            data-anim="p2-border"
+            className="absolute inset-0 w-full h-full pointer-events-none z-20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <filter id="p2-glow-blur" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="4" />
+              </filter>
+            </defs>
+            <rect
+              data-anim="p2-border-glow"
+              x="1.5"
+              y="1.5"
+              width="calc(100% - 3px)"
+              height="calc(100% - 3px)"
+              stroke="#FFF176"
+              strokeWidth="6"
+              opacity="0"
+              filter="url(#p2-glow-blur)"
+            />
+            <rect x="1.5" y="1.5" width="calc(100% - 3px)" height="calc(100% - 3px)" stroke="#FFF176" strokeWidth="3" />
+          </svg>
+        </div>
 
         {/* 03 + 04 — side by side, stacked on mobile */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-12 mb-8 sm:mb-12">

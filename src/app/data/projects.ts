@@ -8,23 +8,31 @@ import type { Project } from "../types";
  */
 export const PROJECTS: Project[] = [
   {
-    index: "02",
-    tech: "React · Node.js · MongoDB · Hackathon",
-    title: "FarmEasy",
-    description:
-      "A web application connecting farmers directly with consumers — eliminating middlemen with direct listings, ordering, and a simple marketplace flow. Built for a hackathon.",
-    tags: ["Farmer Listings", "Marketplace", "Consumer Access", "Dashboard", "Auth"],
-    imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=450&fit=crop&auto=format",
-    imageAlt: "dashboard",
-  },
-  {
     index: "01",
     tech: "Flutter · Supabase · Dart",
     title: "The Unani Academy",
     description:
       "Mobile learning platform for students — purchase courses, read PDFs, track progress. Supabase backend with seamless auth.",
-    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop&auto=format",
+    imageUrl:
+      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop&auto=format",
     imageAlt: "mobile app",
+  },
+  {
+    index: "02",
+    tech: "React · Node.js · MongoDB · Hackathon",
+    title: "FarmEasy",
+    description:
+      "A web application connecting farmers directly with consumers — eliminating middlemen with direct listings, ordering, and a simple marketplace flow. Built for a hackathon.",
+    tags: [
+      "Farmer Listings",
+      "Marketplace",
+      "Consumer Access",
+      "Dashboard",
+      "Auth",
+    ],
+    imageUrl:
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=450&fit=crop&auto=format",
+    imageAlt: "dashboard",
   },
   {
     index: "03",
