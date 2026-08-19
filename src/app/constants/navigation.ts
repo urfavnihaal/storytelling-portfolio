@@ -6,11 +6,10 @@ export const NAV_ITEMS: NavItem[] = [
   ["03", "timeline"],
   ["04", "skills"],
   ["05", "projects"],
-  ["06", "gallery"],
-  ["07", "certs"],
-  ["08", "experience"],
-  ["09", "process"],
-  ["10", "contact"],
+  ["06", "certs"],
+  ["07", "experience"],
+  ["08", "process"],
+  ["09", "contact"],
 ];
 
 /** Section ids used for scroll-spy (IntersectionObserver) in App.tsx */

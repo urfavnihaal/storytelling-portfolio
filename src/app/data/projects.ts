@@ -8,7 +8,7 @@ import type { Project } from "../types";
  */
 export const PROJECTS: Project[] = [
   {
-    index: "01",
+    index: "02",
     tech: "React · Node.js · MongoDB · Hackathon",
     title: "FarmEasy",
     description:
@@ -18,7 +18,7 @@ export const PROJECTS: Project[] = [
     imageAlt: "dashboard",
   },
   {
-    index: "02",
+    index: "01",
     tech: "Flutter · Supabase · Dart",
     title: "The Unani Academy",
     description:

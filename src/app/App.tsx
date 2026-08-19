@@ -9,7 +9,6 @@ import {
   TimelineSection,
   SkillsSection,
   ProjectsSection,
-  GallerySection,
   CertificatesSection,
   ExperienceSection,
   ProcessSection,
@@ -47,7 +46,6 @@ export default function App() {
         <TimelineSection />
         <SkillsSection />
         <ProjectsSection />
-        <GallerySection />
         <CertificatesSection />
         <ExperienceSection />
         <ProcessSection />

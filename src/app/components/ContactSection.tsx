@@ -70,7 +70,7 @@ export function ContactSection() {
 
             <div className="mt-6 sm:mt-10">
               <Sticky color="#FFF176" rotate={-2} style={{ display: "inline-block", padding: "12px 20px" }}>
-                <p className="font-['Caveat'] text-[#0D0D0D] text-sm font-semibold">Chennai, India 🇮🇳</p>
+                <p className="font-['Caveat'] text-[#0D0D0D] text-sm font-semibold">Chennai, India</p>
                 <p className="font-['Caveat'] text-xs mt-1" style={{ color: "rgba(13,13,13,0.58)" }}>
                   open to remote &amp; relocation
                 </p>
